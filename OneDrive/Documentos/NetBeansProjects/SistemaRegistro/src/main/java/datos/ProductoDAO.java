@@ -44,7 +44,8 @@ public class ProductoDAO {
             em.close();
         }
     }
-        public void ActualizarProducto(Producto productoActualizar) {
+
+    public void ActualizarProducto(Producto productoActualizar) {
         EntityManager em = PersistenceUtil.getEntityManagerFactory().createEntityManager();
         try {
             em.getTransaction().begin();
@@ -129,5 +130,51 @@ public class ProductoDAO {
             em.close();
         }
         return lista;
+    }
+
+    public Producto BuscarProductoPorCodigo(String codigo) {
+        EntityManager em = PersistenceUtil.getEntityManagerFactory().createEntityManager();
+        try {
+            return em.createQuery("SELECT p FROM Producto p WHERE p.codigo = :cod", Producto.class)
+                    .setParameter("cod", codigo)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        } finally {
+            em.close();
+        }
+    }
+
+    public int RegistrarProducto(Producto productoAgregar) {
+        // Inicia la sesion de trabajo con la base de datos
+        EntityManager em = PersistenceUtil.getEntityManagerFactory().createEntityManager();
+        try {
+            Long count = em.createQuery(
+                    "SELECT COUNT(p) FROM Producto p WHERE p.codigo = :numCod", Long.class)
+                    .setParameter("numCod", productoAgregar.getCodigo())
+                    .getSingleResult();
+
+            // Existe el Producto, porque el contador dio un resultado
+            if (count > 0) {
+                return 0;
+            }
+
+            // Se inicia la transicion
+            em.getTransaction().begin();
+            // Se inserta el producto
+            em.persist(productoAgregar);
+            // Confirmar y guardar los cambios
+            em.getTransaction().commit();
+            return 1;
+        } catch (Exception ex) {
+            // Revertir todo, no guardar nada
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            return 2;
+
+        } finally {
+            em.close();
+        }
     }
 }

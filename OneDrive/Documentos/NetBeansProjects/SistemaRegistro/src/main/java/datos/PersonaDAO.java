@@ -161,7 +161,7 @@ public class PersonaDAO {
         try {
 
             Persona personaExiste = em.createQuery(
-                    "SELECT p FROM usuario p WHERE p.cedula = :cedula", Persona.class
+                    "SELECT p FROM persona p WHERE p.cedula = :cedula", Persona.class
             ).setParameter("cedula", personaAgregar.getCedula()).getSingleResult();
 
             if (personaExiste != null) {
@@ -205,6 +205,52 @@ public class PersonaDAO {
             );
             q.setParameter("txt", texto);
             return q.getResultList();
+        } finally {
+            em.close();
+        }
+    }
+
+    public int RegistrarPersona(Persona personaAgregar) {
+        // Inicia la sesion de trabajo con la base de datos
+        EntityManager em = PersistenceUtil.getEntityManagerFactory().createEntityManager();
+        try {
+            Long count = em.createQuery(
+                    "SELECT COUNT(p) FROM Persona p WHERE p.cedula = :numId", Long.class)
+                    .setParameter("numId", personaAgregar.getCedula())
+                    .getSingleResult();
+
+            // Existe la persona, porque el contador dio un resultado
+            if (count > 0) {
+                return 0;
+            }
+
+            // Se inicia la transicion
+            em.getTransaction().begin();
+            // Se inserta la persona
+            em.persist(personaAgregar);
+            // Confirmar y guardar los cambios
+            em.getTransaction().commit();
+            return 1;
+        } catch (Exception ex) {
+            // Revertir todo, no guardar nada
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            return 2;
+
+        } finally {
+            em.close();
+        }
+    }
+
+    public Persona BuscarPersonaPorCedula(String cedula) {
+        EntityManager em = PersistenceUtil.getEntityManagerFactory().createEntityManager();
+        try {
+            return em.createQuery("SELECT p FROM Persona p WHERE p.cedula = :cedula", Persona.class)
+                    .setParameter("cedula", cedula)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
         } finally {
             em.close();
         }
