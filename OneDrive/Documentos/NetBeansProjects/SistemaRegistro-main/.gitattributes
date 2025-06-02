@@ -1,0 +1,10 @@
+# Manejo de fin de línea uniforme para código fuente
+* text=auto
+
+# Archivos fuente de Java y XML con saltos de línea LF
+*.java text eol=lf
+*.xml text eol=lf
+*.properties text eol=lf
+*.sh text eol=lf
+*.gradle text eol=lf
+*.md text eol=lf

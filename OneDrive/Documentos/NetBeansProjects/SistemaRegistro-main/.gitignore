@@ -1,0 +1,29 @@
+# Archivos específicos de NetBeans
+nbproject/private/
+build/
+dist/
+
+# Archivos compilados
+*.class
+*.jar
+*.war
+*.ear
+
+# Archivos temporales y de respaldo
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+*.orig
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Archivos de IDEs y herramientas
+*.iml
+.idea/
+.vscode/
